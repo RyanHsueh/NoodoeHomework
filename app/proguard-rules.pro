@@ -20,4 +20,4 @@
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
 
--keep class com.ryanhsueh.noodoehomeword.Model** { *; }
+-keep class com.ryanhsueh.noodoehomeword.bean.Model** { *; }

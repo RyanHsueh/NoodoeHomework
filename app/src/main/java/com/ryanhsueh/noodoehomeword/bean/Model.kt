@@ -1,4 +1,4 @@
-package com.ryanhsueh.noodoehomeword
+package com.ryanhsueh.noodoehomeword.bean
 
 import com.google.gson.annotations.SerializedName
 
@@ -19,8 +19,8 @@ object Model {
 
     data class Timezone(@SerializedName("timezone") val timezone: Int)
 
-    data class ResponseUpdate(@SerializedName("updatedAt") val updatedAt: String,
-                              @SerializedName("role") val role: Role)
+    data class ResponseUpdate<T>(@SerializedName("updatedAt") val updatedAt: String,
+                                 @SerializedName("role") val role: T)
 
     data class Role(@SerializedName("__op") val __op: String)
 

@@ -1,5 +1,7 @@
-package com.ryanhsueh.noodoehomeword
+package com.ryanhsueh.noodoehomeword.api
 
+import com.ryanhsueh.noodoehomeword.constants.Constants
+import com.ryanhsueh.noodoehomeword.bean.Model
 import io.reactivex.Observable
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
@@ -23,17 +25,13 @@ interface HomeworkService {
     @PUT("users/{objectId}")
     fun updateUser(@Path("objectId") objectId: String,
                    @Body timezone: Model.Timezone
-    ): Observable<Model.ResponseUpdate>
+    ): Observable<Model.ResponseUpdate<Model.Role>>
 
     //-- Restfule api
 
 
 
     companion object {
-        private const val BASE_URL = "https://watch-master-staging.herokuapp.com/api/"
-        private const val APPLICATION_ID = "vqYuKPOkLQLYHhk4QTGsGKFwATT4mBIGREI2m8eD"
-        private const val REST_API_KEY = ""
-
         private var sessionToken: String? = null
         fun setToken(token: String) {
             sessionToken = token
@@ -47,7 +45,7 @@ interface HomeworkService {
             val retrofit = Retrofit.Builder()
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                 .addConverterFactory(GsonConverterFactory.create())
-                .baseUrl(BASE_URL)
+                .baseUrl(Constants.BASE_URL)
                 .client(httpClient.build())
                 .build()
 
@@ -60,11 +58,11 @@ interface HomeworkService {
                 val builder = chain.request().newBuilder()
                 builder.header(
                     "X-Parse-Application-Id",
-                    APPLICATION_ID
+                    Constants.APPLICATION_ID
                 )
                 builder.header(
                     "X-Parse-REST-API-Key",
-                    REST_API_KEY
+                    Constants.REST_API_KEY
                 )
                 if (sessionToken != null) {
                     builder.header(
