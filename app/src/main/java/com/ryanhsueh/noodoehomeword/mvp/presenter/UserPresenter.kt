@@ -2,20 +2,25 @@ package com.ryanhsueh.noodoehomeword.mvp.presenter
 
 import android.util.Log
 import com.ryanhsueh.noodoehomeword.api.HomeworkService
+import com.ryanhsueh.noodoehomeword.api.ServiceManager
 import com.ryanhsueh.noodoehomeword.bean.Model
 import com.ryanhsueh.noodoehomeword.mvp.constract.UserContract
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
+import org.kodein.di.Kodein
+import org.kodein.di.generic.instance
 
 /**
  * Created by ryanhsueh on 2019-12-05
  */
-class UserPresenter(private val view: UserContract.IView): UserContract.IPresenter {
+class UserPresenter(kodein: Kodein, private val view: UserContract.IView): UserContract.IPresenter {
 
-    private val homeworkService by lazy {
-        HomeworkService.create()
-    }
+    private val serviceManager: ServiceManager by kodein.instance()
+
+//    private val homeworkService by lazy {
+//        HomeworkService.create()
+//    }
 
     private var compositeDisposable: CompositeDisposable
     private var user: Model.UserInfo? = null
@@ -37,14 +42,15 @@ class UserPresenter(private val view: UserContract.IView): UserContract.IPresent
     }
 
     override fun login(username: String, password: String) {
-        val disposable = homeworkService.login(username, password)
+//        val disposable = homeworkService.login(username, password)
+        val disposable = serviceManager.userService.login(username, password)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(
                 { result ->
                     Log.d(TAG, "sessionToken = ${result.sessionToken}")
                     user = result
-                    HomeworkService.setToken(user!!.sessionToken)
+                    HomeworkService.sessionToken = user!!.sessionToken
 
                     view.onLoginSuccess(user!!.sessionToken)
                 },
@@ -58,7 +64,7 @@ class UserPresenter(private val view: UserContract.IView): UserContract.IPresent
     override fun updateTimezone(timezone: Int) {
         if (user != null) {
             val body = Model.Timezone(timezone)
-            val disposable = homeworkService.updateUser(user!!.objectId, body)
+            val disposable = serviceManager.userService.updateUser(user!!.objectId, body)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
@@ -75,16 +81,15 @@ class UserPresenter(private val view: UserContract.IView): UserContract.IPresent
     }
 
     override fun loginAndUpdateTimezone(username: String, password: String, timezone: Int) {
-        val disposable = homeworkService.login(username, password)
+        val disposable = serviceManager.userService.login(username, password)
             .subscribeOn(Schedulers.io())
             .flatMap { result ->
                 Log.d(TAG, "sessionToken = ${result.sessionToken}")
                 user = result
-                HomeworkService.setToken(user!!.sessionToken)
-                view.onLoginSuccess(user!!.sessionToken)
+                HomeworkService.sessionToken = user!!.sessionToken
 
                 val body = Model.Timezone(timezone)
-                homeworkService.updateUser(user!!.objectId, body)
+                serviceManager.userService.updateUser(user!!.objectId, body)
             }
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(

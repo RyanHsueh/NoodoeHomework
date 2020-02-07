@@ -8,8 +8,12 @@ import android.widget.TextView
 import com.ryanhsueh.noodoehomeword.R
 import com.ryanhsueh.noodoehomeword.mvp.constract.UserContract
 import com.ryanhsueh.noodoehomeword.mvp.presenter.UserPresenter
+import org.kodein.di.Kodein
+import org.kodein.di.KodeinAware
+import org.kodein.di.android.closestKodein
 
-class MainActivity : AppCompatActivity(), UserContract.IView {
+class MainActivity : AppCompatActivity(), KodeinAware, UserContract.IView {
+    override val kodein by closestKodein() //To change initializer of created properties use File | Settings | File Templates.
 
     private val tag = MainActivity::class.java.simpleName
 
@@ -27,7 +31,7 @@ class MainActivity : AppCompatActivity(), UserContract.IView {
 
         textView = findViewById(R.id.text_view)
 
-        presenter = UserPresenter(this)
+        presenter = UserPresenter(kodein,this)
     }
 
     override fun onResume() {

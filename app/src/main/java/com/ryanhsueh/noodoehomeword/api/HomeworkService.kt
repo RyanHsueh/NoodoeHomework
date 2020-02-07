@@ -32,10 +32,7 @@ interface HomeworkService {
 
 
     companion object {
-        private var sessionToken: String? = null
-        fun setToken(token: String) {
-            sessionToken = token
-        }
+        var sessionToken: String? = null
 
         fun create(): HomeworkService {
 
